@@ -3,7 +3,7 @@
 name: danklinux-hyprland
 description: Silverblue NVIDIA image with danklinux-style hyprland desktop.
 
-base-image: ghcr.io/ublue-os/silverblue-nvidia:latest
+base-image: ghcr.io/ublue-os/silverblue-nvidia
 image-version: 42
 
 modules:
