@@ -4,7 +4,7 @@ name: danklinux-niri
 description: Silverblue NVIDIA image with danklinux-style niri desktop.
 
 base-image: ghcr.io/ublue-os/silverblue-nvidia
-image-version: 42
+image-version: 43
 
 modules:
   - type: files
@@ -16,7 +16,6 @@ modules:
     repos:
       copr:
         - avengemedia/dms
-        - atim/starship
     install:
       packages:
         - fastfetch
@@ -26,7 +25,7 @@ modules:
         - cliphist
         - wl-clipboard
         - kitty
-        - qt6-multimedia
+        - qt6-qtmultimedia
         - accountsservice
     remove:
       packages:
