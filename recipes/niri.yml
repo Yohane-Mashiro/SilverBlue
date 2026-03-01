@@ -34,7 +34,7 @@ modules:
 
   - type: script
     scripts:
-      - scripts/setup-dms-niri.sh
+      - setup-dms-niri.sh
 
   - type: default-flatpaks
     configurations:

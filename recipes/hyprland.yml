@@ -16,6 +16,7 @@ modules:
     repos:
       copr:
         - avengemedia/dms
+        - solopasha/hyprland
     install:
       packages:
         - fastfetch
@@ -28,6 +29,7 @@ modules:
         - qt6-qtmultimedia
         - accountsservice
         - xdg-desktop-portal-hyprland
+        
     remove:
       packages:
         - firefox
@@ -35,7 +37,7 @@ modules:
 
   - type: script
     scripts:
-      - scripts/setup-dms-hyprland.sh
+      - setup-dms-hyprland.sh
 
   - type: default-flatpaks
     configurations:
