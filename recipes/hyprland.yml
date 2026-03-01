@@ -1,0 +1,47 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+name: danklinux-hyprland
+description: Silverblue NVIDIA image with danklinux-style hyprland desktop.
+
+base-image: ghcr.io/ublue-os/silverblue-nvidia:latest
+image-version: 42
+
+modules:
+  - type: files
+    files:
+      - source: system
+        destination: /
+
+  - type: dnf
+    repos:
+      copr:
+        - avengemedia/dms
+        - atim/starship
+    install:
+      packages:
+        - fastfetch
+        - hyprland
+        - dms
+        - matugen
+        - cliphist
+        - wl-clipboard
+        - kitty
+        - qt6-multimedia
+        - accountsservice
+        - xdg-desktop-portal-hyprland
+    remove:
+      packages:
+        - firefox
+        - firefox-langpacks
+
+  - type: script
+    scripts:
+      - scripts/setup-dms-hyprland.sh
+
+  - type: default-flatpaks
+    configurations:
+      - notify: true
+        scope: system
+      - scope: user
+
+  - type: signing

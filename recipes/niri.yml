@@ -1,0 +1,46 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+name: danklinux-niri
+description: Silverblue NVIDIA image with danklinux-style niri desktop.
+
+base-image: ghcr.io/ublue-os/silverblue-nvidia:latest
+image-version: 42
+
+modules:
+  - type: files
+    files:
+      - source: system
+        destination: /
+
+  - type: dnf
+    repos:
+      copr:
+        - avengemedia/dms
+        - atim/starship
+    install:
+      packages:
+        - fastfetch
+        - niri
+        - dms
+        - matugen
+        - cliphist
+        - wl-clipboard
+        - kitty
+        - qt6-multimedia
+        - accountsservice
+    remove:
+      packages:
+        - firefox
+        - firefox-langpacks
+
+  - type: script
+    scripts:
+      - scripts/setup-dms-niri.sh
+
+  - type: default-flatpaks
+    configurations:
+      - notify: true
+        scope: system
+      - scope: user
+
+  - type: signing
