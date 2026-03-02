@@ -40,13 +40,15 @@ SKIP_HYPRLAND=false
 FONTSET_DIR_NAME=""
 ILLOGICAL_IMPULSE_VIRTUAL_ENV="${ILLOGICAL_IMPULSE_VIRTUAL_ENV:-}"
 
+TARGET_EXISTING_USER="${TARGET_EXISTING_USER:-hare}"
+
 EXPERIMENTAL_FILES_SCRIPT=false
 INSTALL_FIRSTRUN=false
 
-# 系統級目標目錄
-XDG_CONFIG_HOME="/usr/etc"
-XDG_DATA_HOME="/usr/share"
-XDG_BIN_HOME="/usr/bin"
+# 新使用者預設配置目錄（/etc/skel）
+XDG_CONFIG_HOME="/etc/skel/.config"
+XDG_DATA_HOME="/etc/skel/.local/share"
+XDG_BIN_HOME="/etc/skel/.local/bin"
 XDG_CACHE_HOME="/tmp/ii-cache"
 XDG_STATE_HOME="/tmp/ii-state"
 
@@ -64,5 +66,75 @@ fi
 echo "以 setup 邏輯執行主題安裝（fedora, skip deps/setups）"
 source ./sdata/subcmd-install/3.files.sh
 
-echo "完成：已按 setup 邏輯安裝 Fedora 主題配置。"
+POST_INSTALL_SCRIPT="/usr/libexec/silverblue-apply-hypr-theme.sh"
+POST_INSTALL_SERVICE="/etc/systemd/system/silverblue-apply-hypr-theme.service"
+POST_INSTALL_WANTS_DIR="/etc/systemd/system/multi-user.target.wants"
+POST_INSTALL_MARKER_DIR="/var/lib/silverblue-hypr-theme"
+
+mkdir -p "$(dirname "$POST_INSTALL_SCRIPT")"
+cat > "$POST_INSTALL_SCRIPT" <<'EOF'
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+TARGET_USER="${1:-hare}"
+MARKER_DIR="/var/lib/silverblue-hypr-theme"
+MARKER_FILE="${MARKER_DIR}/${TARGET_USER}.synced"
+SKEL_CONFIG_DIR="/etc/skel/.config"
+SKEL_DATA_DIR="/etc/skel/.local/share"
+
+if [[ -f "$MARKER_FILE" ]]; then
+	exit 0
+fi
+
+if ! id "$TARGET_USER" >/dev/null 2>&1; then
+	echo "[post-install] 使用者不存在，略過：$TARGET_USER"
+	exit 0
+fi
+
+TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
+if [[ -z "$TARGET_HOME" ]] || [[ ! -d "$TARGET_HOME" ]]; then
+	echo "[post-install] 找不到使用者家目錄，略過：$TARGET_USER"
+	exit 0
+fi
+
+mkdir -p "$TARGET_HOME/.config"
+mkdir -p "$TARGET_HOME/.local/share"
+
+if [[ -d "$SKEL_CONFIG_DIR" ]]; then
+	rsync -a "$SKEL_CONFIG_DIR/" "$TARGET_HOME/.config/"
+fi
+
+if [[ -d "$SKEL_DATA_DIR" ]]; then
+	rsync -a "$SKEL_DATA_DIR/" "$TARGET_HOME/.local/share/"
+fi
+
+chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config" "$TARGET_HOME/.local/share"
+
+mkdir -p "$MARKER_DIR"
+touch "$MARKER_FILE"
+
+echo "[post-install] 已同步主題配置到 $TARGET_USER"
+EOF
+chmod 0755 "$POST_INSTALL_SCRIPT"
+
+mkdir -p "$(dirname "$POST_INSTALL_SERVICE")"
+cat > "$POST_INSTALL_SERVICE" <<EOF
+[Unit]
+Description=Apply Hyprland theme to existing user on first boot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=${POST_INSTALL_SCRIPT} ${TARGET_EXISTING_USER}
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+mkdir -p "$POST_INSTALL_WANTS_DIR"
+ln -sf "$POST_INSTALL_SERVICE" "$POST_INSTALL_WANTS_DIR/$(basename "$POST_INSTALL_SERVICE")"
+
+echo "完成：已安裝到 /etc/skel，並部署首次開機同步服務（目標使用者：${TARGET_EXISTING_USER}）。"
 
