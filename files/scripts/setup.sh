@@ -2,57 +2,66 @@
 
 set -euo pipefail
 
-UPSTREAM_REPO="https://github.com/end-4/dots-hyprland.git"
-WORKDIR="$(mktemp -d)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="${SCRIPT_DIR}/dots-hyprland"
 
-cleanup() {
-	rm -rf "${WORKDIR}"
-}
-trap cleanup EXIT
-
-sync_config_dir() {
-	local name="$1"
-	local source_dir="${WORKDIR}/dots-hyprland/dots/.config/${name}"
-	local target_dir="/etc/xdg/${name}"
-
-	if [[ -d "${source_dir}" ]]; then
-		mkdir -p "${target_dir}"
-		rsync -a --delete "${source_dir}/" "${target_dir}/"
-	fi
-}
-
-echo "[setup] Cloning ${UPSTREAM_REPO}..."
-git clone --depth 1 "${UPSTREAM_REPO}" "${WORKDIR}/dots-hyprland"
-
-echo "[setup] Copying required configs into /etc/xdg..."
-mkdir -p /etc/xdg
-
-for dir in hypr quickshell matugen kitty fish fontconfig wlogout qt5ct qt6ct; do
-	sync_config_dir "${dir}"
-done
-
-echo "[setup] Copying shared assets into /usr/share..."
-if [[ -d "${WORKDIR}/dots-hyprland/dots/.local/share" ]]; then
-	mkdir -p /usr/share
-	rsync -a "${WORKDIR}/dots-hyprland/dots/.local/share/" /usr/share/
+if [[ $EUID -ne 0 ]]; then
+	echo "請使用 root 權限執行（blue-build 構建環境通常已是 root）。" >&2
+	exit 1
 fi
 
-echo "[setup] Ensuring Hyprland custom include files exist..."
-mkdir -p /etc/xdg/hypr/custom
-for conf in env execs general keybinds rules; do
-	if [[ ! -f "/etc/xdg/hypr/custom/${conf}.conf" ]]; then
-		touch "/etc/xdg/hypr/custom/${conf}.conf"
-	fi
-done
+if [[ ! -d "$REPO_ROOT" ]]; then
+	echo "來源目錄不存在: $REPO_ROOT" >&2
+	exit 1
+fi
 
-echo "[setup] Rewriting hardcoded home config paths to system-level paths..."
-while IFS= read -r -d '' file; do
-	sed -i \
-		-e 's|~/.config/hypr|/etc/xdg/hypr|g' \
-		-e 's|~/.config/quickshell|/etc/xdg/quickshell|g' \
-		"${file}"
-done < <(find /etc/xdg/hypr -type f -print0)
+cd "$REPO_ROOT"
 
-find /etc/xdg/hypr -type f -name '*.sh' -exec chmod 0755 {} +
+source ./sdata/lib/environment-variables.sh
+source ./sdata/lib/functions.sh
 
-echo "[setup] System-level config copy complete."
+# 強制 Fedora 安裝路徑，跳過依賴與 setup，僅執行主題檔案安裝
+OS_DISTRO_ID="fedora"
+OS_DISTRO_ID_LIKE="fedora"
+OS_GROUP_ID="fedora"
+INSTALL_VIA_NIX=false
+
+SKIP_ALLDEPS=false
+SKIP_ALLSETUPS=false
+SKIP_ALLGREETING=false
+SKIP_BACKUP=true
+ask=false
+
+# 安裝完整主題配置（不跳過 misc/quickshell/fish/fontconfig）
+SKIP_MISCCONF=false
+SKIP_QUICKSHELL=false
+SKIP_FISH=false
+SKIP_FONTCONFIG=false
+SKIP_HYPRLAND=false
+
+EXPERIMENTAL_FILES_SCRIPT=false
+INSTALL_FIRSTRUN=false
+
+# 系統級目標目錄
+XDG_CONFIG_HOME="/usr/etc"
+XDG_DATA_HOME="/usr/share"
+XDG_BIN_HOME="/usr/bin"
+XDG_CACHE_HOME="/tmp/ii-cache"
+XDG_STATE_HOME="/tmp/ii-state"
+
+# 避免在系統配置目錄生成安裝狀態檔
+DOTS_CORE_CONFDIR="/tmp/ii-build"
+INSTALLED_LISTFILE="${DOTS_CORE_CONFDIR}/installed_listfile"
+FIRSTRUN_FILE="${DOTS_CORE_CONFDIR}/installed_true"
+BACKUP_DIR="/tmp/ii-backup"
+
+if [[ ! -f ./sdata/subcmd-install/3.files.sh ]]; then
+	echo "找不到檔案安裝腳本: ./sdata/subcmd-install/3.files.sh" >&2
+	exit 1
+fi
+
+echo "以 setup 邏輯執行主題安裝（fedora, skip deps/setups）"
+source ./sdata/subcmd-install/3.files.sh
+
+echo "完成：已按 setup 邏輯安裝 Fedora 主題配置。"
+

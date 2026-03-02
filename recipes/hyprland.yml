@@ -152,6 +152,8 @@ modules:
         - gamescope
         - podman-docker
         - zsh
+        - systemd
+        - rpm-ostree
 
         
         
