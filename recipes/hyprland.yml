@@ -157,6 +157,10 @@ modules:
         - systemd
         - rpm-ostree
         - ptyxis
+    remove:
+      packages:
+        - firefox
+        - firefox-langpacks
 
         
         
