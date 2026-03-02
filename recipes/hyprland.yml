@@ -1,9 +1,9 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: danklinux-hyprland
+name: core-hyprland
 description: Silverblue NVIDIA image with danklinux-style hyprland desktop.
 
-base-image: ghcr.io/ublue-os/silverblue-nvidia
+base-image: ghcr.io/ublue-os/base-nvidia
 image-version: 43
 
 modules:
@@ -15,29 +15,143 @@ modules:
   - type: dnf
     repos:
       copr:
+        - ririko66z/dots-hyprland
+        - sdegler/hyprland
+        - deltacopy/darkly
+        - alternateved/eza
+        - atim/starship
         - avengemedia/dms
-        - solopasha/hyprland
     install:
       packages:
-        - fastfetch
-        - hyprland
-        - dms
-        - matugen
+        - bc
+        - bibata-cursor-theme
+        - bluedevil
+        - breakpad
+        - breeze-cursor-theme
+        - breeze-icon-theme
+        - breeze-icon-theme-fedora
+        - breeze-plus-icon-theme
+        - brightnessctl
+        - cava
+        - clang
         - cliphist
-        - wl-clipboard
+        - cmake
+        - coreutils
+        - curl
+        - darkly
+        - ddcutil
+        - dolphin
+        - dms
+        - eza
+        - git
+        - fish
+        - fastfetch
+        - florian-karsten-space-grotesk-fonts
+        - fuzzel
+        - geoclue2
+        - glib2
+        - gnome-keyring
+        - gnome-terminal
+        - gobject-introspection-devel
+        - google-material-symbols-vf-rounded-fonts
+        - google-rubik-vf-fonts
+        - google-sans-flex-vf-fonts
+        - grub2-breeze-theme
+        - gtk4-devel
+        - hypridle
+        - hyprland
+        - hyprland-guiutils
+        - hyprlock
+        - hyprpicker
+        - hyprshot
+        - hyprsunset
+        - ImageMagick
+        - jemalloc
+        - jetbrains-mono-nerd-fonts
+        - jq
+        - kdialog
+        - kf6-breeze-icons
+        - kf6-kirigami
+        - kf6-syntax-highlighting
         - kitty
+        - libadwaita-devel
+        - libdbusmenu-gtk3-devel
+        - libdrm
+        - libportal-gtk4
+        - libsoup3-devel
+        - libxcb
+        - material-icons-fonts
+        - matugen
+        - microtex
+        - mpvpaper
+        - NetworkManager
+        - pavucontrol
+        - pipewire-libs
+        - playerctl
+        - plasma-nm
+        - plasma-systemmonitor
+        - plasma-systemsettings
+        - polkit-kde
+        - python3
+        - python3.12
+        - python3-devel
+        - python3.12-devel
+        - qalculate
+        - qt5-qtwayland
+        - qt6-qt5compat
+        - qt6-qtbase
+        - qt6-qtdeclarative
+        - qt6-qtimageformats
         - qt6-qtmultimedia
-        - accountsservice
+        - qt6-qtpositioning
+        - qt6-qtquicktimeline
+        - qt6-qtsensors
+        - qt6-qtsvg
+        - qt6-qttools
+        - qt6-qttranslations
+        - qt6-qtvirtualkeyboard
+        - qt6-qtwayland
+        - quickshell-git
+        - readex-pro-fonts-all
+        - ripgrep
+        - rsync
+        - sddm-breeze
+        - slurp
+        - songrec
+        - starship
+        - swappy
+        - tesseract
+        - tesseract-langpack-chi_sim
+        - tesseract-langpack-eng
+        - translate-shell
+        - twitter-twemoji-fonts
+        - unzip
+        - upower
+        - uv
+        - wayland-devel
+        - wf-recorder
+        - wget2
+        - wl-clipboard
+        - wlogout
+        - wireplumber
+        - wtype
+        - xdg-desktop-portal
+        - xdg-desktop-portal-gtk
         - xdg-desktop-portal-hyprland
+        - xdg-desktop-portal-kde
+        - xdg-utils
+        - ydotool
+        - yq
+        - accountsservice
+        - google-chrome-stable
+        - easyeffects
         
-    remove:
-      packages:
-        - firefox
-        - firefox-langpacks
+        
+        
 
   - type: script
     scripts:
-      - setup-dms-hyprland.sh
+      - setup.sh
 
   - type: default-flatpaks
     configurations:

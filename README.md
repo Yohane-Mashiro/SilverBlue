@@ -1,64 +1,34 @@
-# SilverBlue DankLinux Variants &nbsp; [![bluebuild build badge](https://github.com/blue-build/template/actions/workflows/build.yml/badge.svg)](https://github.com/blue-build/template/actions/workflows/build.yml)
+# SilverBlue core 变体 &nbsp; [![bluebuild 构建徽章](https://github.com/blue-build/template/actions/workflows/build.yml/badge.svg)](https://github.com/blue-build/template/actions/workflows/build.yml)
 
-See the [BlueBuild docs](https://blue-build.org/how-to/setup/) for quick setup instructions for setting up your own repository based on this template.
+请参考 [BlueBuild 文档](https://blue-build.org/how-to/setup/) 快速完成基于此模板的仓库初始化。
 
-This repository builds and distributes two Fedora Silverblue NVIDIA variants:
+本仓库构建并分发 Fedora Silverblue NVIDIA 变体镜像：
 
-- `ghcr.io/<user>/danklinux-niri`
-- `ghcr.io/<user>/danklinux-hyprland`
+- `ghcr.io/yohane-mashiro/core-hyprland`
 
-Both variants integrate the official DankMaterialShell (DMS) stack from the Dank Linux Fedora repository, including:
 
-- `dms`
-- `matugen`
-- `cliphist`
-
-Variant defaults are pre-seeded to `/etc/skel` during image build via `dms setup`:
-
-- niri image: DMS is bound to `niri.service`
-- hyprland image: Includes `hyprland-session.target` plus required systemd env bootstrap lines in Hyprland config
-
-For existing users (created before rebase), run this once after login to generate user configs:
-
-```bash
-dms setup
-```
-
-## Installation
+## 安装
 
 > [!WARNING]  
-> [This is an experimental feature](https://www.fedoraproject.org/wiki/Changes/OstreeNativeContainerStable), try at your own discretion.
+> [这是一个实验性功能](https://www.fedoraproject.org/wiki/Changes/OstreeNativeContainerStable)，请自行评估后使用。
 
-To rebase an existing atomic Fedora installation to the latest build:
-
-- Rebase to `danklinux-niri` (unsigned):
+将现有 Fedora Atomic 系统 rebase 到最新镜像：
   ```
-  rpm-ostree rebase ostree-unverified-registry:ghcr.io/<user>/danklinux-niri:latest
+- rebase 到 `core-hyprland`：
   ```
-- Rebase to `danklinux-hyprland` (unsigned):
-  ```
-  rpm-ostree rebase ostree-unverified-registry:ghcr.io/<user>/danklinux-hyprland:latest
+  rpm-ostree rebase ostree-unverified-registry:ghcr.io/yohane-mashiro/core-hyprland:latest
   ```
 
-- Then rebase to the signed image (replace image name as needed):
-  ```
-  rpm-ostree rebase ostree-image-signed:docker://ghcr.io/<user>/<image-name>:latest
-  ```
-- Reboot to complete the installation
-  ```
-  systemctl reboot
-  ```
-
-The `latest` tag will automatically point to the latest build. Both recipes are pinned to Fedora 42 via `image-version`.
+`latest` 标签会自动指向最新构建。两个配方都通过 `image-version` 固定到 Fedora 43。
 
 ## ISO
 
-If build on Fedora Atomic, you can generate an offline ISO with the instructions available [here](https://blue-build.org/learn/universal-blue/#fresh-install-from-an-iso). These ISOs cannot unfortunately be distributed on GitHub for free due to large sizes, so for public projects something else has to be used for hosting.
+如果在 Fedora Atomic 上构建，可按 [这里](https://blue-build.org/learn/universal-blue/#fresh-install-from-an-iso) 的说明生成离线 ISO。由于体积较大，公开项目通常无法免费直接在 GitHub 分发 ISO，需要使用其他托管方式。
 
-## Verification
+## 签名验证
 
-These images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](https://github.com/sigstore/cosign). You can verify the signature by downloading the `cosign.pub` file from this repo and running the following command:
+镜像使用 [Sigstore](https://www.sigstore.dev/) 的 [cosign](https://github.com/sigstore/cosign) 进行签名。下载本仓库的 `cosign.pub` 后，可执行以下命令验证：
 
 ```bash
-cosign verify --key cosign.pub ghcr.io/<user>/<image-name>
+cosign verify --key cosign.pub ghcr.io/yohane-mashiro/<image-name>
 ```
