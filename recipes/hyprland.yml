@@ -156,6 +156,7 @@ modules:
         - zsh
         - systemd
         - rpm-ostree
+        - ptyxis
 
         
         
