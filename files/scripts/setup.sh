@@ -3,17 +3,18 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="${SCRIPT_DIR}/dots-hyprland"
+DOTS_REPO_URL="https://github.com/end-4/dots-hyprland.git"
+DOTS_CLONE_DIR="/tmp/dots-hyprland"
 
 if [[ $EUID -ne 0 ]]; then
 	echo "請使用 root 權限執行（blue-build 構建環境通常已是 root）。" >&2
 	exit 1
 fi
 
-if [[ ! -d "$REPO_ROOT" ]]; then
-	echo "來源目錄不存在: $REPO_ROOT" >&2
-	exit 1
-fi
+echo "正在 clone: $DOTS_REPO_URL"
+git clone --depth 1 "$DOTS_REPO_URL" "$DOTS_CLONE_DIR"
+
+REPO_ROOT="$DOTS_CLONE_DIR"
 
 cd "$REPO_ROOT"
 
