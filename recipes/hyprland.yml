@@ -38,6 +38,7 @@ modules:
         - cmake
         - coreutils
         - curl
+        - adw-gtk3-theme
         - darkly
         - ddcutil
         - dolphin
@@ -46,6 +47,7 @@ modules:
         - git
         - fish
         - fastfetch
+        - fontconfig
         - florian-karsten-space-grotesk-fonts
         - fuzzel
         - geoclue2
