@@ -145,7 +145,14 @@ modules:
         - accountsservice
         - google-chrome-stable
         - easyeffects
-        
+        - fcitx5
+        - fcitx5-chinese-addons
+        - fcitx5-configtool
+        - fcitx5-rime
+        - gamescope
+        - podman-docker
+        - zsh
+
         
         
 
