@@ -13,7 +13,6 @@
 > [这是一个实验性功能](https://www.fedoraproject.org/wiki/Changes/OstreeNativeContainerStable)，请自行评估后使用。
 
 将现有 Fedora Atomic 系统 rebase 到最新镜像：
-  ```
 - rebase 到 `core-hyprland`：
   ```
   rpm-ostree rebase ostree-unverified-registry:ghcr.io/yohane-mashiro/core-hyprland:latest
