@@ -20,7 +20,6 @@ cd "$REPO_ROOT"
 source ./sdata/lib/environment-variables.sh
 source ./sdata/lib/functions.sh
 
-# 強制 Fedora 安裝路徑，跳過依賴與 setup，僅執行主題檔案安裝
 OS_DISTRO_ID="fedora"
 OS_DISTRO_ID_LIKE="fedora"
 OS_GROUP_ID="fedora"
@@ -39,6 +38,7 @@ SKIP_FISH=false
 SKIP_FONTCONFIG=false
 SKIP_HYPRLAND=false
 FONTSET_DIR_NAME=""
+ILLOGICAL_IMPULSE_VIRTUAL_ENV="${ILLOGICAL_IMPULSE_VIRTUAL_ENV:-}"
 
 EXPERIMENTAL_FILES_SCRIPT=false
 INSTALL_FIRSTRUN=false
