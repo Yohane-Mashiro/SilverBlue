@@ -159,6 +159,7 @@ modules:
         - ptyxis
         - distrobox
         - steam
+        - lutris
     remove:
       packages:
         - firefox
@@ -175,6 +176,8 @@ modules:
     configurations:
       - notify: true
         scope: system
+        install: 
+          - com.vysp3r.ProtonPlus
       - scope: user
 
   - type: signing
