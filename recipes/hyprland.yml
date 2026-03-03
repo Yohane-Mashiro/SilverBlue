@@ -157,6 +157,7 @@ modules:
         - systemd
         - rpm-ostree
         - ptyxis
+        - distrobox
     remove:
       packages:
         - firefox

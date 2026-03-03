@@ -11,6 +11,12 @@ if [[ $EUID -ne 0 ]]; then
 	exit 1
 fi
 
+PLASMA_SESSION_FILE="/usr/share/wayland-sessions/plasma.desktop"
+if [[ -f "$PLASMA_SESSION_FILE" ]]; then
+	rm -f "$PLASMA_SESSION_FILE"
+	echo "已移除：$PLASMA_SESSION_FILE"
+fi
+
 echo "正在 clone: $DOTS_REPO_URL"
 git clone --depth 1 "$DOTS_REPO_URL" "$DOTS_CLONE_DIR"
 
@@ -67,9 +73,7 @@ fi
 echo "以 setup 邏輯執行主題安裝（fedora, skip deps/setups）"
 source ./sdata/subcmd-install/3.files.sh
 
-POST_INSTALL_SCRIPT="/usr/libexec/silverblue-apply-hypr-theme.sh"
-POST_INSTALL_SERVICE="/etc/systemd/system/silverblue-apply-hypr-theme.service"
-POST_INSTALL_WANTS_DIR="/etc/systemd/system/multi-user.target.wants"
+POST_INSTALL_SCRIPT="/usr/local/bin/hyprtheme-default"
 POST_INSTALL_MARKER_DIR="/var/lib/silverblue-hypr-theme"
 
 mkdir -p "$(dirname "$POST_INSTALL_SCRIPT")"
@@ -119,23 +123,6 @@ echo "[post-install] 已同步主題配置到 $TARGET_USER"
 EOF
 chmod 0755 "$POST_INSTALL_SCRIPT"
 
-mkdir -p "$(dirname "$POST_INSTALL_SERVICE")"
-cat > "$POST_INSTALL_SERVICE" <<EOF
-[Unit]
-Description=Apply Hyprland theme to existing user on first boot
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=oneshot
-ExecStart=${POST_INSTALL_SCRIPT} ${TARGET_EXISTING_USER}
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-mkdir -p "$POST_INSTALL_WANTS_DIR"
-ln -sf "$POST_INSTALL_SERVICE" "$POST_INSTALL_WANTS_DIR/$(basename "$POST_INSTALL_SERVICE")"
-
-echo "完成：已安裝到 /etc/skel，並部署首次開機同步服務（目標使用者：${TARGET_EXISTING_USER}）。"
+echo "完成：已安裝到 /etc/skel，並部署手動同步命令 ${POST_INSTALL_SCRIPT}。"
+echo "用法：${POST_INSTALL_SCRIPT} ${TARGET_EXISTING_USER}"
 
