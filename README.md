@@ -20,6 +20,23 @@
 
 `latest` 标签会自动指向最新构建。两个配方都通过 `image-version` 固定到 Fedora 43。
 
+启动选项
+
+- hyprland.desktop (传统启动)
+启动方式：直接运行 /usr/bin/start-hyprland 脚本。
+缺点：它只是启动了图形界面。它不负责管理用户的 D-Bus 会话、systemd 服务或者环境变量。
+
+- hyprland-uwsm.desktop (推荐启动)
+什么是 UWSM？：它是 Universal Wayland Session Manager（通用 Wayland 会话管理器）。
+启动方式：通过 uwsm 来拉起 Hyprland。
+
+使用主题
+[主题链接](https://github.com/end-4/dots-hyprland)
+用命令来设置为默认值
+
+```bash
+hyprtheme-default
+```
 ## ISO
 
 如果在 Fedora Atomic 上构建，可按 [这里](https://blue-build.org/learn/universal-blue/#fresh-install-from-an-iso) 的说明生成离线 ISO。由于体积较大，公开项目通常无法免费直接在 GitHub 分发 ISO，需要使用其他托管方式。
