@@ -158,6 +158,7 @@ modules:
         - rpm-ostree
         - ptyxis
         - distrobox
+        - steam
     remove:
       packages:
         - firefox

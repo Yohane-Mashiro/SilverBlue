@@ -73,7 +73,8 @@ fi
 echo "以 setup 邏輯執行主題安裝（fedora, skip deps/setups）"
 source ./sdata/subcmd-install/3.files.sh
 
-POST_INSTALL_SCRIPT="/usr/local/bin/hyprtheme-default"
+POST_INSTALL_SCRIPT="/usr/bin/hyprtheme-default"
+POST_INSTALL_WRAPPER="/usr/local/bin/hyprtheme-default"
 POST_INSTALL_MARKER_DIR="/var/lib/silverblue-hypr-theme"
 
 mkdir -p "$(dirname "$POST_INSTALL_SCRIPT")"
@@ -122,6 +123,16 @@ touch "$MARKER_FILE"
 echo "[post-install] 已同步主題配置到 $TARGET_USER"
 EOF
 chmod 0755 "$POST_INSTALL_SCRIPT"
+
+mkdir -p "$(dirname "$POST_INSTALL_WRAPPER")"
+cat > "$POST_INSTALL_WRAPPER" <<'EOF'
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+exec /usr/bin/hyprtheme-default "$@"
+EOF
+chmod 0755 "$POST_INSTALL_WRAPPER"
 
 echo "完成：已安裝到 /etc/skel，並部署手動同步命令 ${POST_INSTALL_SCRIPT}。"
 echo "用法：${POST_INSTALL_SCRIPT} ${TARGET_EXISTING_USER}"
