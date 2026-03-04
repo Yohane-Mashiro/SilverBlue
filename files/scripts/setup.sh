@@ -47,8 +47,6 @@ SKIP_HYPRLAND=false
 FONTSET_DIR_NAME=""
 ILLOGICAL_IMPULSE_VIRTUAL_ENV="${ILLOGICAL_IMPULSE_VIRTUAL_ENV:-}"
 
-TARGET_EXISTING_USER="${TARGET_EXISTING_USER:-hare}"
-
 EXPERIMENTAL_FILES_SCRIPT=false
 INSTALL_FIRSTRUN=false
 
@@ -83,44 +81,68 @@ cat > "$POST_INSTALL_SCRIPT" <<'EOF'
 
 set -euo pipefail
 
-TARGET_USER="${1:-hare}"
 MARKER_DIR="/var/lib/silverblue-hypr-theme"
-MARKER_FILE="${MARKER_DIR}/${TARGET_USER}.synced"
 SKEL_CONFIG_DIR="/etc/skel/.config"
 SKEL_DATA_DIR="/etc/skel/.local/share"
 
-if [[ -f "$MARKER_FILE" ]]; then
+sync_user() {
+	local target_user="$1"
+	local marker_file="${MARKER_DIR}/${target_user}.synced"
+	local target_home
+
+	if [[ -f "$marker_file" ]]; then
+		return 0
+	fi
+
+	if ! id "$target_user" >/dev/null 2>&1; then
+		echo "[post-install] 使用者不存在，略過：$target_user"
+		return 0
+	fi
+
+	target_home="$(getent passwd "$target_user" | cut -d: -f6)"
+	if [[ -z "$target_home" ]] || [[ ! -d "$target_home" ]]; then
+		echo "[post-install] 找不到使用者家目錄，略過：$target_user"
+		return 0
+	fi
+
+	mkdir -p "$target_home/.config"
+	mkdir -p "$target_home/.local/share"
+
+	if [[ -d "$SKEL_CONFIG_DIR" ]]; then
+		rsync -a "$SKEL_CONFIG_DIR/" "$target_home/.config/"
+	fi
+
+	if [[ -d "$SKEL_DATA_DIR" ]]; then
+		rsync -a "$SKEL_DATA_DIR/" "$target_home/.local/share/"
+	fi
+
+	chown -R "$target_user:$target_user" "$target_home/.config" "$target_home/.local/share"
+
+	mkdir -p "$MARKER_DIR"
+	touch "$marker_file"
+
+	echo "[post-install] 已同步主題配置到 $target_user"
+}
+
+if [[ $# -gt 0 ]]; then
+	sync_user "$1"
 	exit 0
 fi
 
-if ! id "$TARGET_USER" >/dev/null 2>&1; then
-	echo "[post-install] 使用者不存在，略過：$TARGET_USER"
-	exit 0
-fi
-
-TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
-if [[ -z "$TARGET_HOME" ]] || [[ ! -d "$TARGET_HOME" ]]; then
-	echo "[post-install] 找不到使用者家目錄，略過：$TARGET_USER"
-	exit 0
-fi
-
-mkdir -p "$TARGET_HOME/.config"
-mkdir -p "$TARGET_HOME/.local/share"
-
-if [[ -d "$SKEL_CONFIG_DIR" ]]; then
-	rsync -a "$SKEL_CONFIG_DIR/" "$TARGET_HOME/.config/"
-fi
-
-if [[ -d "$SKEL_DATA_DIR" ]]; then
-	rsync -a "$SKEL_DATA_DIR/" "$TARGET_HOME/.local/share/"
-fi
-
-chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.config" "$TARGET_HOME/.local/share"
-
-mkdir -p "$MARKER_DIR"
-touch "$MARKER_FILE"
-
-echo "[post-install] 已同步主題配置到 $TARGET_USER"
+while IFS=: read -r username _ uid _ _ home shell; do
+	if [[ "$uid" -lt 1000 ]]; then
+		continue
+	fi
+	if [[ ! -d "$home" ]]; then
+		continue
+	fi
+	case "$shell" in
+		""|"/usr/sbin/nologin"|"/sbin/nologin"|"/bin/false")
+			continue
+			;;
+	esac
+	sync_user "$username"
+done < /etc/passwd
 EOF
 chmod 0755 "$POST_INSTALL_SCRIPT"
 
@@ -135,5 +157,5 @@ EOF
 chmod 0755 "$POST_INSTALL_WRAPPER"
 
 echo "完成：已安裝到 /etc/skel，並部署手動同步命令 ${POST_INSTALL_SCRIPT}。"
-echo "用法：${POST_INSTALL_SCRIPT} ${TARGET_EXISTING_USER}"
+echo "用法：${POST_INSTALL_SCRIPT} [username]（不帶參數時會同步所有一般使用者）"
 
