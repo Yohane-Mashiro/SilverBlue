@@ -7,6 +7,7 @@
 - `ghcr.io/yohane-mashiro/core-hyprland`
 
 
+
 ## 安装
 
 > [!WARNING]  
@@ -37,10 +38,12 @@
 
 使用主题
 [主题链接](https://github.com/end-4/dots-hyprland)
+<img width="1280" height="800" alt="Screenshot_fedora_2026-03-06_23:13:20" src="https://github.com/user-attachments/assets/c6d0dbea-44b9-4e56-b8e5-79bc75243370" />
 用命令来设置为默认值
 
 ```bash
-hyprtheme-default
+sudo hyprtheme-default
+reboot
 ```
 ## ISO
 
