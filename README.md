@@ -18,6 +18,11 @@
   rpm-ostree rebase ostree-unverified-registry:ghcr.io/yohane-mashiro/core-hyprland:latest
   ```
 
+  国内网速不好的用这个
+  ```
+  rpm-ostree rebase ostree-unverified-registry:ghcr.nju.edu.cn/yohane-mashiro/core-hyprland:latest
+  ```
+
 `latest` 标签会自动指向最新构建。两个配方都通过 `image-version` 固定到 Fedora 43。
 
 启动选项
